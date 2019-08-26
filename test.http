@@ -1,0 +1,11 @@
+GET http://localhost:3000
+
+###
+
+@title = title from vscode's rest api client
+@body = body from vscode's rest api client...
+POST http://localhost:3000/
+Content-Type: application/x-www-form-urlencoded
+
+title={{title}}
+&body={{body}}
