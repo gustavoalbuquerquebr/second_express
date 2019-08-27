@@ -1,0 +1,15 @@
+<% include ./partials/header %>
+
+<h2>Posts</h2>
+
+<!-- If no posts were found -->
+<% if (posts.length === 0) { %>
+<h5>No posts found</h5>
+<% } %>
+<!-- If post were found -->
+<% posts.forEach(post => { %>
+<h3><%= post.title %></h3>
+<p><%= post.body %></p>
+<hr />
+
+<% }) %> <% include ./partials/footer %>
