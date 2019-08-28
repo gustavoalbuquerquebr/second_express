@@ -2,11 +2,18 @@
 
 <h2>HOME</h2>
 
+<% if (user) { %>
+<h5><%= `${user.username} is logged in` %></h5>
+<% } else { %>
+<h5><%= "No user logged in" %></h5>
+<% } %>
+
 <ul>
   <li><a href="/posts">View Posts</a></li>
   <li><a href="/posts/new">Create New Post</a></li>
   <li><a href="/register">Register User</a></li>
   <li><a href="/login">Log In</a></li>
+  <li><a href="/logout">Log Out</a></li>
 </ul>
 
 <% include ./partials/footer %>

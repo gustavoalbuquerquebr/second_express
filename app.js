@@ -1,21 +1,49 @@
 "use strict";
 
+// require libraries
 const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser");
+require("dotenv").config();
 
+// express's settings and middleware
+const app = express();
+app.set("view engine", "ejs");
+app.use(express.static("public"));
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+// connect to database
 const connectDB = require("./config/db");
 connectDB();
 
+// require models
 const Post = require("./models/Post");
 const User = require("./models/User");
 
-const app = express();
-app.set("view engine", "ejs");
-app.use(express.urlencoded({ extended: true }));
+// require custom middleware
+const decodeToken = require("./middleware/decode");
+const privateRoute = require("./middleware/private");
 
-app.get("/", (req, res) => {
-  res.render("home");
+const secretKey = process.env.SECRET_KEY;
+const tokenExpiresIn = parseInt(process.env.TOKEN_EXPIRES_IN);
+
+console.log(typeof tokenExpiresIn);
+console.log(tokenExpiresIn);
+
+app.get("/", decodeToken, async (req, res) => {
+  if (!req.userid) {
+    return res.render("home", { user: false });
+  }
+
+  try {
+    const user = await User.findById(req.userid);
+    res.render("home", { user });
+  } catch {
+    res.send("Error");
+  }
 });
 
 app.use("/posts", require("./routes/posts"));
@@ -29,12 +57,16 @@ app.post("/register", async (req, res) => {
     const password = req.body.password;
     const hash = await bcrypt.hash(password, 10);
 
-    const newUser = User.create({
+    const newUser = await User.create({
       username: req.body.username,
       password: hash,
     });
 
-    res.redirect("/");
+    const payload = { userid: newUser.id };
+    const token = jwt.sign(payload, secretKey, { expiresIn: tokenExpiresIn });
+    res
+      .cookie("token", token, { maxAge: tokenExpiresIn * 1000 })
+      .send("registered and logged in");
   } catch {
     res.send("Error!");
   }
@@ -54,11 +86,24 @@ app.post("/login", async (req, res) => {
     }
 
     const check = await bcrypt.compare(req.body.password, foundUser.password);
-    check ? res.redirect("/") : res.send("Wrong password");
+
+    if (!check) {
+      return res.send("Wrong password");
+    }
+
+    const payload = { userid: foundUser.id };
+    const token = jwt.sign(payload, secretKey, { expiresIn: tokenExpiresIn });
+    res
+      .cookie("token", token, { maxAge: tokenExpiresIn * 1000 })
+      .send("logged in");
   } catch (err) {
     res.send("Error!");
   }
 });
 
+app.get("/logout", async (req, res) => {
+  res.clearCookie("token").send("logged out");
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, console.log(`Server started at ${PORT}...`));
+app.listen(PORT, () => console.log(`Server started at ${PORT}...`));

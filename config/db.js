@@ -1,15 +1,13 @@
 "use strict";
 
 const mongoose = require("mongoose");
+const mongoURI = process.env.MONGO_URI;
 
 async function connectDB() {
   try {
-    await mongoose.connect(
-      "mongodb+srv://gustavo:pass123@cluster0-grgdl.mongodb.net/test?retryWrites=true&w=majority",
-      {
-        useNewUrlParser: true,
-      },
-    );
+    await mongoose.connect(mongoURI, {
+      useNewUrlParser: true,
+    });
 
     console.log("Connected to database...");
   } catch (err) {

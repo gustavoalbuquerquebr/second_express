@@ -2,6 +2,7 @@
 
 const express = require("express");
 const router = express.Router();
+const privateRoute = require("../middleware/private");
 
 const Post = require("../models/Post");
 
@@ -14,7 +15,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/new", (req, res) => {
+router.get("/new", privateRoute, (req, res) => {
   res.render("new");
 });
 

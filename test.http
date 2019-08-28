@@ -9,3 +9,14 @@ Content-Type: application/x-www-form-urlencoded
 
 title={{title}}
 &body={{body}}
+
+###
+POST http://localhost:3000/login
+Content-Type: application/x-www-form-urlencoded
+
+username=gustavo
+&password=gustavo
+
+###
+GET http://localhost:3000/secret
+x-auth-token: 123
