@@ -7,6 +7,7 @@ async function connectDB() {
   try {
     await mongoose.connect(mongoURI, {
       useNewUrlParser: true,
+      useCreateIndex: true,
     });
 
     console.log("Connected to database...");

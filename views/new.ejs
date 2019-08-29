@@ -2,6 +2,7 @@
 
 <h2>Create New Post</h2>
 <form action="/posts" method="post">
+  <input type="text" name="author" value="<%=userid%>" hidden />
   <input type="text" name="title" />
   <textarea name="body" cols="30" rows="10"></textarea>
   <input type="submit" value="Add new" />

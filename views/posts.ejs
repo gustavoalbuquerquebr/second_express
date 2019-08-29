@@ -7,8 +7,9 @@
 <h5>No posts found</h5>
 <% } %>
 <!-- If post were found -->
-<% posts.forEach(post => { %>
+<% posts.reverse().forEach(post => { %>
 <h3><%= post.title %></h3>
+<h5>Author: <%= post.author.email.split("@")[0] %></h5>
 <p><%= post.body %></p>
 <hr />
 

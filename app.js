@@ -30,9 +30,6 @@ const privateRoute = require("./middleware/private");
 const secretKey = process.env.SECRET_KEY;
 const tokenExpiresIn = parseInt(process.env.TOKEN_EXPIRES_IN);
 
-console.log(typeof tokenExpiresIn);
-console.log(tokenExpiresIn);
-
 app.get("/", decodeToken, async (req, res) => {
   if (!req.userid) {
     return res.render("home", { user: false });
@@ -58,17 +55,33 @@ app.post("/register", async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
 
     const newUser = await User.create({
-      username: req.body.username,
+      email: req.body.email,
       password: hash,
     });
 
     const payload = { userid: newUser.id };
     const token = jwt.sign(payload, secretKey, { expiresIn: tokenExpiresIn });
-    res
-      .cookie("token", token, { maxAge: tokenExpiresIn * 1000 })
-      .send("registered and logged in");
-  } catch {
-    res.send("Error!");
+    res.cookie("token", token, { maxAge: tokenExpiresIn * 1000 }).redirect("/");
+  } catch (err) {
+    res.send("Error! " + err);
+  }
+});
+
+app.post("/register", async (req, res) => {
+  try {
+    const password = req.body.password;
+    const hash = await bcrypt.hash(password, 10);
+
+    const newUser = await User.create({
+      email: req.body.email,
+      password: hash,
+    });
+
+    const payload = { userid: newUser.id };
+    const token = jwt.sign(payload, secretKey, { expiresIn: tokenExpiresIn });
+    res.cookie("token", token, { maxAge: tokenExpiresIn * 1000 }).redirect("/");
+  } catch (err) {
+    res.send("Error! " + err);
   }
 });
 
@@ -78,7 +91,7 @@ app.get("/login", (req, res) => {
 
 app.post("/login", async (req, res) => {
   try {
-    const foundUser = await User.findOne({ username: req.body.username });
+    const foundUser = await User.findOne({ email: req.body.email });
 
     if (!foundUser) {
       // TOPIC: return is needed, otherwise the engine will keep executing this function until the end
@@ -93,16 +106,14 @@ app.post("/login", async (req, res) => {
 
     const payload = { userid: foundUser.id };
     const token = jwt.sign(payload, secretKey, { expiresIn: tokenExpiresIn });
-    res
-      .cookie("token", token, { maxAge: tokenExpiresIn * 1000 })
-      .send("logged in");
+    res.cookie("token", token, { maxAge: tokenExpiresIn * 1000 }).redirect("/");
   } catch (err) {
     res.send("Error!");
   }
 });
 
 app.get("/logout", async (req, res) => {
-  res.clearCookie("token").send("logged out");
+  res.clearCookie("token").redirect("/");
 });
 
 const PORT = process.env.PORT || 3000;

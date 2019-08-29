@@ -3,7 +3,7 @@
 <h2>HOME</h2>
 
 <% if (user) { %>
-<h5><%= `${user.username} is logged in` %></h5>
+<h5><%= `${user.email.split("@")[0]} is logged in` %></h5>
 <% } else { %>
 <h5><%= "No user logged in" %></h5>
 <% } %>
