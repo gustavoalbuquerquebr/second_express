@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const { check, validationResult } = require("express-validator");
 require("dotenv").config();
 
 // express's settings and middleware
@@ -46,44 +47,42 @@ app.get("/", decodeToken, async (req, res) => {
 app.use("/posts", require("./routes/posts"));
 
 app.get("/register", (req, res) => {
-  res.render("register");
+  res.render("register", { errors: false });
 });
 
-app.post("/register", async (req, res) => {
-  try {
-    const password = req.body.password;
-    const hash = await bcrypt.hash(password, 10);
+app.post(
+  "/register",
+  [
+    check("email")
+      .isEmail()
+      .withMessage("Invalid email"),
+    check("password")
+      .isLength({ min: 5 })
+      .withMessage("Password must be at least 5 chars long"),
+  ],
+  async (req, res) => {
+    try {
+      let errors = validationResult(req);
 
-    const newUser = await User.create({
-      email: req.body.email,
-      password: hash,
-    });
+      if (!errors.isEmpty()) {
+        errors = errors.errors.map(err => err.msg);
+        // return res.send(errMsg);
+        return res.render("register", { errors });
+      }
 
-    const payload = { userid: newUser.id };
-    const token = jwt.sign(payload, secretKey, { expiresIn: tokenExpiresIn });
-    res.cookie("token", token, { maxAge: tokenExpiresIn * 1000 }).redirect("/");
-  } catch (err) {
-    res.send("Error! " + err);
-  }
-});
+      req.body.password = await bcrypt.hash(req.body.password, 10);
+      const newUser = await User.create(req.body);
 
-app.post("/register", async (req, res) => {
-  try {
-    const password = req.body.password;
-    const hash = await bcrypt.hash(password, 10);
-
-    const newUser = await User.create({
-      email: req.body.email,
-      password: hash,
-    });
-
-    const payload = { userid: newUser.id };
-    const token = jwt.sign(payload, secretKey, { expiresIn: tokenExpiresIn });
-    res.cookie("token", token, { maxAge: tokenExpiresIn * 1000 }).redirect("/");
-  } catch (err) {
-    res.send("Error! " + err);
-  }
-});
+      const payload = { userid: newUser.id };
+      const token = jwt.sign(payload, secretKey, { expiresIn: tokenExpiresIn });
+      res
+        .cookie("token", token, { maxAge: tokenExpiresIn * 1000 })
+        .redirect("/");
+    } catch {
+      res.send("Error");
+    }
+  },
+);
 
 app.get("/login", (req, res) => {
   res.render("login");
