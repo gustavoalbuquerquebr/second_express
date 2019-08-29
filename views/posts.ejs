@@ -8,13 +8,16 @@
 <% } %>
 <!-- If post were found -->
 <% posts.reverse().forEach(post => { %>
-<h3><%= post.title %></h3>
+<h3><a href="/posts/<%=post.id%>"><%= post.title %></a></h3>
 <h5>Author: <%= post.author.email.split("@")[0] %></h5>
 <h5>
   Posted on: <%=post.date.getMonth() + 1%> - <%=post.date.getDate()%> -
   <%=post.date.getFullYear()%>
 </h5>
 <p><%= post.body %></p>
+
+<!-- <form action="/" method="post"></form> -->
+
 <hr />
 
 <% }) %> <% include ./partials/footer %>

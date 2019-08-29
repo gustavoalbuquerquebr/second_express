@@ -6,7 +6,7 @@ function decodeToken(req, res, next) {
   const token = req.cookies.token;
 
   if (!token) {
-    next();
+    return next();
   }
 
   try {

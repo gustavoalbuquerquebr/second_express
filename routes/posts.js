@@ -30,4 +30,28 @@ router.post("/", privateRoute, async (req, res) => {
   }
 });
 
+router.get("/:id", decodeToken, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id).populate("author");
+    res.render("post", { post, userid: req.userid || false });
+  } catch (err) {
+    res.send("No post found");
+  }
+});
+
+router.delete("/:id", privateRoute, async (req, res) => {
+  await Post.findByIdAndDelete(req.params.id);
+  res.redirect("/posts");
+});
+
+router.get("/:id/edit", privateRoute, async (req, res) => {
+  const post = await Post.findById(req.params.id);
+  res.render("edit", { post });
+});
+
+router.put("/:id", privateRoute, async (req, res) => {
+  await Post.findByIdAndUpdate(req.params.id, req.body);
+  res.redirect(`/posts/${req.params.id}`);
+});
+
 module.exports = router;

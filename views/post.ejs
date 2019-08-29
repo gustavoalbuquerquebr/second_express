@@ -1,0 +1,18 @@
+<% include ./partials/header %>
+
+<h2><%=post.title%></h2>
+<h5>Author: <%= post.author.email.split("@")[0] %></h5>
+<h5>
+  Posted on: <%=post.date.getMonth() + 1%> - <%=post.date.getDate()%> -
+  <%=post.date.getFullYear()%>
+</h5>
+<p><%=post.body%></p>
+
+<hr />
+
+<% if (userid) { %>
+<form action="/posts/<%=post.id%>?_method=DELETE" method="post">
+  <input type="submit" value="Delete" />
+</form>
+<a href="/posts/<%=post.id%>/edit">Edit</a>
+<% } %> <% include ./partials/footer %>

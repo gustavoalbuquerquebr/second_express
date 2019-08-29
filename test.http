@@ -24,3 +24,10 @@ Content-Type: application/x-www-form-urlencoded
 title=my title
 &body=my body
 &author=me
+
+###
+PUT http://localhost:3000/posts/5d681f27c3e8f831cb22b63a
+Content-Type: application/x-www-form-urlencoded
+
+title= my new title 2 !
+&body= my new body 2 !

@@ -1,1 +1,1 @@
-simple blog cms with login system using express with async/await syntax, mongoose, bcrypt, ejs, jwt and cookie-parser for auth, and rest api vscode for testing
+simple blog cms with login system using express with async/await syntax, mongoose, bcrypt, ejs, jwt and cookie-parser for auth, method-override for requests, and rest api vscode for testing

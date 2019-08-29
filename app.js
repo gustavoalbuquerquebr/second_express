@@ -7,6 +7,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const { check, validationResult } = require("express-validator");
+const methodOverride = require("method-override");
 require("dotenv").config();
 
 // express's settings and middleware
@@ -15,6 +16,7 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(methodOverride("_method"));
 
 // connect to database
 const connectDB = require("./config/db");
